@@ -91,3 +91,6 @@ FROM created_alerts ca
 UPDATE device
 SET connected = false
 WHERE id in (select device_id from dv_to_disconnect)
+
+-- Clean temp tables
+drop table if exists gw_to_disconnect, dv_to_disconnect, created_alerts;
