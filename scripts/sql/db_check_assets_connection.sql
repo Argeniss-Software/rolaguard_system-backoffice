@@ -18,13 +18,16 @@ SELECT
     g.last_packet_id as packet_id,
     json_build_object(
         'packet_id', g.last_packet_id,
-        'gateway', g.gw_hex_id,
-        'gw_name', g.name,
-        'gw_vendor', g.vendor,
+        'packet_date', to_char(pck.date, 'YYYY-MM-DD HH24:MI:SS TZ'),
+        'packet_data', row_to_json(pck),
+        'created_at', now(),
         'dev_eui', null,
         'dev_name', null,
         'dev_vendor', null,
         'dev_addr', null,
+        'gateway', g.gw_hex_id,
+        'gw_name', g.name,
+        'gw_vendor', g.vendor,
         'last_activity', g.last_activity,
         'activity_freq', g.activity_freq,
         'policy_name', p.name,
@@ -35,6 +38,7 @@ FROM gateway g
     JOIN data_collector dc on g.data_collector_id = dc.id
     JOIN policy_item pitem on pitem.alert_type_code = 'LAF-403' and dc.policy_id = pitem.policy_id
     JOIN policy p on p.id = pitem.policy_id
+    JOIN packet pck on pck.id = g.last_packet_id
     JOIN row_processed rp on rp.analyzer = 'packet_analyzer'
     JOIN packet proc_pck on proc_pck.id = rp.last_row
 WHERE g.connected and 
@@ -86,13 +90,16 @@ SELECT
     d.last_packet_id as packet_id,
     json_build_object(
         'packet_id', d.last_packet_id,
-        'gateway', g.gw_hex_id,
-        'gw_name', g.name,
-        'gw_vendor', g.vendor,
+        'packet_date', to_char(pck.date, 'YYYY-MM-DD HH24:MI:SS TZ'),
+        'packet_data', row_to_json(pck),
+        'created_at', now(),
         'dev_eui', d.dev_eui,
         'dev_name', d.name,
         'dev_vendor', d.vendor,
         'dev_addr', null,
+        'gateway', g.gw_hex_id,
+        'gw_name', g.name,
+        'gw_vendor', g.vendor,
         'last_activity', d.last_activity,
         'activity_freq', d.activity_freq,
         'policy_name', p.name,
